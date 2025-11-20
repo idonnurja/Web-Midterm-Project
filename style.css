@@ -1,0 +1,97 @@
+/* CSS */
+        :root {
+            --primary: #007bff;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --bg-color: #f4f7f6;
+            --card-color: white;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: #333;
+        }
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        header h1 { margin: 0; font-size: 1.6em; }
+        .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+        
+        /* Login style */
+        #login-form-container {
+            background-color: var(--card-color);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin: 80px auto;
+        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
+        }
+        .btn-primary {
+            background-color: var(--primary); color: white; padding: 10px 15px; border: none;
+            border-radius: 4px; cursor: pointer; width: 100%; font-size: 1.1em; transition: background-color 0.3s;
+        }
+        .btn-primary:hover { background-color: #0056b3; }
+
+        /* Dashboard style */
+        #dashboard { display: none; }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background-color: var(--card-color);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .card h2 {
+            color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0;
+            font-size: 1.4em;
+        }
+        .status-box {
+            display: flex; justify-content: space-around; text-align: center;
+            margin-bottom: 15px;
+        }
+        .status-item {
+            padding: 15px 10px; border-radius: 5px; width: 30%; font-size: 1.1em; font-weight: 700;
+        }
+        .status-active { background-color: #d4edda; color: var(--success); }
+        .status-inactive { background-color: #fff3cd; color: var(--warning); }
+        .status-broken { background-color: #f8d7da; color: var(--danger); }
+
+        /* tables */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #f0f0f0; }
+
+        /* monitoration */
+        #amortization-calculator .form-group, #monitor-status .monitor-group {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+        }
+        #amortization-calculator input { width: 60%; }
+        #amortization-result { margin-top: 15px; font-size: 1.2em; font-weight: bold; color: var(--danger); }
+        
+        .monitor-group {
+            padding: 10px; border-radius: 5px; margin-bottom: 5px;
+            display: flex; align-items: center; background-color: var(--bg-color);
+        }
+        .monitor-group i { margin-right: 10px; font-size: 1.2em; }
+        .monitor-value { font-weight: 700; color: #333; }
+        .temp-ok { color: var(--success); }
+        .temp-high { color: var(--danger); }
