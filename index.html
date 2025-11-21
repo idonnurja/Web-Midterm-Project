@@ -3,155 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIPM ARKIMEDO-21 - QKTB Dashboard</title>
+    <title>SIPM - Fluksi i Punës Teknik/Inxhinier</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="./style.css">
-
+    
 </head>
 <body>
 
-    <header>
-        <h1><i class="fas fa-hospital-alt"></i> SIPM - ARKIMEDO-21</h1>
-        <div id="user-info" style="color: #ccc;"><i class="fas fa-user-circle"></i> Nuk jeni kyçur</div>
-    </header>
+    <div id="splash-screen" class="full-screen">
+        <div class="splash-logo">
+            <img src="arkimedo21 logo.png" alt="ARKIMEDO-21 Logo">
+        </div>
+    </div>
 
-    <div class="container">
-
-        <div id="login-form-container">
-            <h2>Hyrja në Sistem</h2>
+    <div id="login-form-container" class="full-screen">
+        <div style="width: 100%;">
+            <div class="splash-logo" style="margin-bottom: 20px;"><img src="arkimedo21 logo.png" alt="ARKIMEDO-21 Logo" style="max-width: 200px;"></div>
+            <h2>Login to SIPM</h2>
             <form id="login-form">
                 <div class="form-group">
-                    <label for="username">Emri i Përdoruesit:</label>
-                    <input type="text" id="username" value="user_qsut" required>
+                    <label for="username">Emri i Përdoruesit</label>
+                    <input type="text" id="username" placeholder="teknik/inxhinier/admin" required>
                 </div>
                 <div class="form-group">
-                    <label for="role">Roli (Niveli i Aksesit):</label>
+                    <label for="password">Fjalëkalimi</label>
+                    <input type="password" id="password" placeholder="********" required>
+                </div>
+                <div class="form-group">
+                    <label for="role">Roli / Nivel Aksesi</label>
                     <select id="role">
-                        <option value="end-user">Përdorues Fundor (QSUNT/Spitali)</option>
-                        <option value="admin">Administrator (QKTB)</option>
-                        <option value="auditor">Auditues</option>
+                        <option value="teknik">Teknik Mirëmbajtjeje</option>
+                        <option value="inxhinier">Inxhinier (Përdorues Fundor me Akses)</option>
+                        <option value="administrator">Administrator (QKTB)</option>
                     </select>
                 </div>
-                <button type="submit" class="btn-primary"><i class="fas fa-sign-in-alt"></i> Kyçu</button>
+                <button type="submit" class="btn-primary">Login</button>
             </form>
         </div>
+    </div>
 
-        <div id="dashboard">
+    <div id="dashboard">
+        <header>
+            <h1><i class="fas fa-tools"></i> Dashboard - SIPM Arkimedo-21</h1>
+            <div class="user-info">
+                Mirë se erdhe, <span id="current-user-role"></span>
+                <button onclick="logout()" class="btn-primary" style="width: auto; padding: 5px 10px;">Çkyçu</button>
+            </div>
+        </header>
+
+        <div class="container">
             
-            <div class="card">
-                <h2><i class="fas fa-chart-line"></i> Analiza e Kapaciteteve (Raportim)</h2>
-                <div class="status-box">
-                    <div class="status-item status-active">
-                        150 <br> **AKTIVE**
-                    </div>
-                    <div class="status-item status-inactive">
-                        25 <br> **JO FUNKSIONALE**
-                    </div>
-                    <div class="status-item status-broken">
-                        5 <br> **JASHTË PËRDORIMI**
-                    </div>
+            <div id="teknik-app" class="card" style="display: none;">
+                <h2><i class="fas fa-clipboard-list"></i> Krijimi i Aktit të Konstatimit</h2>
+                <div class="form-group">
+                    <label for="device_id">ID e Pajisjes:</label>
+                    <input type="text" id="device_id" value="QSUT-EKG-6500-006" >
+                </div>
+                <div class="form-group">
+                    <label for="constatation_notes">Përshkrimi i Dëmtimit/Konstatimit:</label>
+                    <textarea id="constatation_notes" placeholder="Pajisja ka dëmtim në monitor dhe duhet ndërhyrje Inxhinierike..."></textarea>
+                </div>
+                <button class="btn-primary" onclick="submitConstatation()">Dërgo Akt Konstatimi (Njofto Inxhinierin)</button>
+            </div>
+
+            <div id="inxhinier-app" class="card" style="display: none;">
+                <h2><i class="fas fa-bell"></i> Njoftime & Detyrat e Reja (Riparimi)</h2>
+                <div id="inxhinier-notifications">
+                    <p style="color: var(--success);">Nuk ka Akt Konstatimi të hapur për momentin.</p>
                 </div>
             </div>
 
-            <div class="grid-container">
-                
-                <div class="card">
-                    <h2><i class="fas fa-calculator"></i> Llogaritja e Amortizimit (0.8^n)</h2>
-                    <p>Metoda e amortizimit sipas kategorisë së pajisjes.</p>
-                    <div id="amortization-calculator">
-                        <div class="form-group">
-                            <label for="vfillestare">Vlera Fillestare:</label>
-                            <input type="number" id="vfillestare" value="25000">
-                        </div>
-                        <div class="form-group">
-                            <label for="data_hyrjes">Data e Hyrjes:</label>
-                            <input type="date" id="data_hyrjes" value="2025-10-15">
-                        </div>
-                        <div class="form-group">
-                            <label for="data_sotme">Data Sotme:</label>
-                            <input type="date" id="data_sotme" value="2027-11-12">
-                        </div>
-                        <div id="amortization-result">Amortizimi i Llogaritur: 0.00 ALL</div>
-                    </div>
+            <div id="admin-app" class="card" style="display: none;">
+                <h2><i class="fas fa-chart-bar"></i> Monitorimi i Përgjithshëm (Administrator)</h2>
+                <p>Këtu shfaqet gjendja e përgjithshme e pajisjeve (Aktive / Jo Funksionale / Jashtë Përdorimi) dhe sinjalizimet e ndryshme (Temperatura, Energjia).</p>
+                <div style="padding: 10px; background-color: #e6f7ff; border: 1px solid #b3e6ff; border-radius: 4px;">
+                    Pajisje Aktive: <span id="devices-active">150</span> |
+                    Jo Funksionale: <span id="devices-malfunction">0</span> |
+                    Sinjalizime: 3
                 </div>
-
-                <div class="card">
-                    <h2><i class="fas fa-bell"></i> Monitorimi në Kohë Reale (Sinjalizimi)</h2>
-                    <p>Monitorim i bazuar në sensorët e vendosur në ambientet ku ndodhen pajisjet.</p>
-                    <div id="monitor-status">
-                        <div class="monitor-group">
-                            <i class="fas fa-thermometer-half"></i> Temperatura: 
-                            <span class="monitor-value temp-ok">22.5 °C (OK)</span>
-                        </div>
-                        <div class="monitor-group">
-                            <i class="fas fa-tint"></i> Lagështia: 
-                            <span class="monitor-value temp-ok">55% (OK)</span>
-                        </div>
-                        <div class="monitor-group">
-                            <i class="fas fa-plug"></i> Furnizimi me Energji: 
-                            <span class="monitor-value temp-ok">Aktiv (Sistemi CT)</span>
-                        </div>
-                        <div class="monitor-group">
-                            <i class="fas fa-fire"></i> Detektimi i Tymit/Zjarrit: 
-                            <span class="monitor-value temp-ok">Pa Vërejtje</span>
-                        </div>
-                        <div class="monitor-group">
-                            <i class="fas fa-map-marker-alt"></i> Vendndodhja (GPS): 
-                            <span class="monitor-value temp-ok">QSUNT (Pozicionuar)</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2><i class="fas fa-list-alt"></i> Regjistri Qendror & Kartela e Personalizuar</h2>
-                <p>Regjistër elektronik dhe Kartelë e personalizuar për çdo pajisje.</p>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Emërtimi</th>
-                            <th>Lloji/Kategoria</th>
-                            <th>Vlera Fillestare</th>
-                            <th>Vlera e Mbetur</th>
-                            <th>Vendndodhja Aktuale</th>
-                            <th>Statusi</th>
-                            <th>QR Code</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>QSUT-EKG-6500-006</td>
-                            <td>Diagnostikuese (EKG)</td>
-                            <td>25,000 ALL</td>
-                            <td id="vlera-mbetur">15,690.62 ALL</td> 
-                            <td>Kirurgjia (Kati 3)</td>
-                            <td>Aktiv</td>
-                            <td><i class="fas fa-qrcode"></i> Akses</td>
-                        </tr>
-                        <tr>
-                            <td>NDR-MON-1200-001</td>
-                            <td>Monitor Mbshtetës</td>
-                            <td>120,000 ALL</td>
-                            <td>100,000 ALL</td>
-                            <td>Urgjenca (Kati 1)</td>
-                            <td>Jo Funksional</td>
-                            <td><i class="fas fa-qrcode"></i> Akses</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="card">
-                <h2><i class="fas fa-calendar-alt"></i> Njoftimet Automatike & Kalendari Teknik</h2>
-                <ul>
-                    <li>Garancia e pajisjes QSUT-EKG-6500-006 skadon në 15.10.2025. **(Njoftim për Skadim Garancie)**</li>
-                    <li>Mirëmbajtja e planifikuar për NDR-MON-1200-001 ka kaluar afatin. **(Kujtesë për Mirëmbajtje)**</li>
-                    <li>Raporti: Sistemi ka gjeneruar procesverbalin teknik J-2025-001 automatikisht.</li>
-                </ul>
             </div>
 
         </div>
-
     </div>
 
     <script src="./script.js"></script>

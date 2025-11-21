@@ -1,87 +1,182 @@
-// JavaScript per Funksionalitetin (i integruar)
+ // Variablat e gjendjes globale
+        let currentRole = '';
+        let openConstatations = []; // Mbajmë Aktin Konstatues hapur
+        const TOTAL_DEVICES = 150;   // numri total i pajisjeve në sistem
 
-        const loginFormContainer = document.getElementById('login-form-container');
-        const dashboard = document.getElementById('dashboard');
-        const loginForm = document.getElementById('login-form');
-        const userInfo = document.getElementById('user-info');
-        
-        // FUSHA E AMORTIZIMIT
-        const vfillestare = document.getElementById('vfillestare');
-        const dataHyrjes = document.getElementById('data_hyrjes');
-        const dataSotme = document.getElementById('data_sotme');
-        const amortizationResult = document.getElementById('amortization-result');
-        const vleraMbeturCell = document.getElementById('vlera-mbetur');
+        // 1. Logjika e Ekranit të Ngarkimit (Splash Screen)
+        document.addEventListener('DOMContentLoaded', () => {
+            const splashScreen = document.getElementById('splash-screen');
+            const loginContainer = document.getElementById('login-form-container');
+            const splashDuration = 3000;
 
-        // FUNKSIONALITETI I KYÇJES DHE ROLEVE
-        loginForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const username = document.getElementById('username').value;
-            const role = document.getElementById('role').value;
+            setTimeout(() => {
+                splashScreen.style.opacity = '0';
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+                    loginContainer.style.display = 'flex';
+                }, 500); 
+            }, splashDuration);
 
-            loginFormContainer.style.display = 'none';
-            dashboard.style.display = 'block';
-            
-            let roleText = 'Përdorues Fundor';
-            if (role === 'admin') roleText = 'Administrator (QKTB)';
-            if (role === 'auditor') roleText = 'Auditues (Vetëm Lexim)';
+            // 🔹 Ngarko konst-at nga localStorage
+            const saved = localStorage.getItem('constatations');
+            if (saved) {
+                try {
+                    openConstatations = JSON.parse(saved);
+                } catch (e) {
+                    openConstatations = [];
+                }
+            }
 
-            userInfo.innerHTML = `<i class="fas fa-user-circle"></i> Kyçur si: **${username}** (${roleText})`;
-            
-            calculate_amortization();
+        // Përditëso menjëherë panelin e adminit (nëse hapet më vonë)
+            updateAdminDashboard();
         });
 
-        // FUNKSIONI I AMORTIZIMIT (KORRIGJUAR PER GABIMET E DATAVE)
-        function calculate_amortization() {
-            var initial_value = vfillestare.value;
-            var start_date_str = dataHyrjes.value;
-            var end_date_str = dataSotme.value;
+        // 2. Logjika e Formës së Hyrjes
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const role = document.getElementById('role').value;
+            currentRole = role;
 
-            if (!initial_value || !start_date_str || !end_date_str || parseFloat(initial_value) <= 0) {
-                amortizationResult.textContent = 'Amortizimi i Llogaritur: 0.00 ALL';
-                vleraMbeturCell.textContent = parseFloat(initial_value).toFixed(2) + ' ALL';
-                return;
+            document.getElementById('login-form-container').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('current-user-role').textContent = role.toUpperCase();
+
+            // Shfaq aplikacionin specifik bazuar në rol
+            showRoleApp(role);
+        });
+
+        function showRoleApp(role) {
+            // Fsheh të gjitha aplikacionet e roleve
+            document.getElementById('teknik-app').style.display = 'none';
+            document.getElementById('inxhinier-app').style.display = 'none';
+            document.getElementById('admin-app').style.display = 'none';
+
+            // Shfaq vetëm atë të duhurin
+            if (role === 'teknik') {
+                document.getElementById('teknik-app').style.display = 'block';
+            } else if (role === 'inxhinier') {
+                document.getElementById('inxhinier-app').style.display = 'block';
+                // Përditëso njoftimet sapo inxhinieri kyçet
+                updateInxhinierNotifications(); 
+            } else if (role === 'administrator') {
+                document.getElementById('admin-app').style.display = 'block';
+                updateAdminDashboard();
             }
-
-            var initial_value_num = parseFloat(initial_value);
-            
-            // Përdorimi i Date.UTC() për të shmangur gabimet e zonës kohore (Gabimi i gabuar = 0)
-            var parts1 = start_date_str.split('-');
-            var parts2 = end_date_str.split('-');
-
-            var d1 = new Date(Date.UTC(parts1[0], parts1[1] - 1, parts1[2]));
-            var d2 = new Date(Date.UTC(parts2[0], parts2[1] - 1, parts2[2]));
-
-            var time1 = d1.getTime();
-            var time2 = d2.getTime();
-
-            if (time2 <= time1) {
-                amortizationResult.textContent = 'Amortizimi i Llogaritur: 0.00 ALL';
-                vleraMbeturCell.textContent = initial_value_num.toFixed(2) + ' ALL';
-                return;
-            }
-
-            // Llogaritja e Numrit të Viteve (n)
-            var diff_ms = time2 - time1; 
-            var ms_in_year = 1000 * 60 * 60 * 24 * 365.25;
-            var years_used = diff_ms / ms_in_year; 
-
-            // Zbatimi i Formules (0.8^n)
-            var depreciation_rate_factor = 0.8;
-            var residual_factor = Math.pow(depreciation_rate_factor, years_used);
-            
-            // Llogarit Vleren e Amortizuar dhe Vlerën e Mbetur
-            var residual_value = initial_value_num * residual_factor;
-            var total_depreciation = initial_value_num - residual_value;
-            
-            // Vendos Vlerat (rrumbullakosur me 2 shifra)
-            amortizationResult.textContent = `Amortizimi i Llogaritur: ${total_depreciation.toFixed(2)} ALL`;
-            vleraMbeturCell.textContent = residual_value.toFixed(2) + ' ALL';
         }
 
-        // EVENT LISTENERS PER AMORTIZIMIN
-        vfillestare.addEventListener('input', calculate_amortization);
-        dataHyrjes.addEventListener('change', calculate_amortization);
-        dataSotme.addEventListener('change', calculate_amortization);
+        // 3. Logjika e Aktit të Konstatimit (TEKNIKU)
+        function submitConstatation() {
+            const deviceId = document.getElementById('device_id').value;
+            const notes = document.getElementById('constatation_notes').value;
+            const teknik = document.getElementById('username').value;
+
+            if (!notes) {
+                alert("Ju lutemi shkruani përshkrimin e dëmtimit!");
+                return;
+            }
+
+            const newConst = {
+                id: Date.now(),
+                deviceId: deviceId,
+                notes: notes,
+                status: 'HAPUR',
+                teknik: teknik
+            };
+
+            // 🔹 Shto në listë
+            openConstatations.push(newConst);
+
+            // 🔹 Ruaj në localStorage
+            localStorage.setItem('constatations', JSON.stringify(openConstatations));
+
+            alert(`Akt Konstatimi i dërguar për pajisjen ${deviceId}. Inxhinieri është njoftuar!`);
+            document.getElementById('constatation_notes').value = '';
+
+            // Përditëso panelin e inxhinierit dhe adminit
+            updateInxhinierNotifications();
+            updateAdminDashboard();
+        }
+
+        // 4. Logjika e Njoftimeve (INXHINIERI)
+        function updateInxhinierNotifications() {
+            const notificationsDiv = document.getElementById('inxhinier-notifications');
+            notificationsDiv.innerHTML = '';
+
+         const openOnes = openConstatations.filter(c => c.status === 'HAPUR');
+
+            if (openOnes.length === 0) {
+                notificationsDiv.innerHTML = '<p style="color: var(--success);"><i class="fas fa-check-circle"></i> Nuk ka Akt Konstatimi të hapur për momentin.</p>';
+                return;
+            }
+
+            notificationsDiv.innerHTML = `
+                <h3><i class="fas fa-exclamation-triangle"></i> DETYRA AKTIVE!</h3>
+            `;
+
+            openOnes.forEach(c => {
+                notificationsDiv.innerHTML += `
+                    <div class="notification-item">
+                        <div>
+                            Pajisja: ${c.deviceId}
+                            <br>Konstatimi: ${c.notes}
+                            <br>Hapur nga: ${c.teknik}
+                        </div>
+                        <button class="btn-success" onclick="completeRepair(${c.id})">
+                            Kryej Riparimin / Mbyll Detyrën
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        // 5. Logjika e Riparimit (INXHINIERI)
+        function completeRepair(constatationId) {
+            const index = openConstatations.findIndex(c => c.id === constatationId);
+
+            if (index !== -1 && openConstatations[index].status === 'HAPUR') {
+                openConstatations[index].status = 'MBYLLUR';
+
+               alert(`Riparimi për pajisjen ${openConstatations[index].deviceId} u krye me sukses dhe Akti i Konstatimit u mbyll.`);
+
+                // Ruaj në localStorage ndryshimin
+                localStorage.setItem('constatations', JSON.stringify(openConstatations));
+
+                // Përditëso të dy rolet
+                updateInxhinierNotifications();
+                updateAdminDashboard();
+            }
+        }
+
+        function updateAdminDashboard() {
+            // sa pajisje janë jo funksionale = numri i rasteve HAPUR
+            const malfunctionCount = openConstatations.filter(c => c.status === 'HAPUR').length;
+
+            // pajisje aktive = total - jo funksionale
+            const activeCount = TOTAL_DEVICES - malfunctionCount;
+
+            const activeSpan = document.getElementById('devices-active');
+            const malSpan = document.getElementById('devices-malfunction');
+
+            if (activeSpan) activeSpan.textContent = activeCount;
+            if (malSpan) malSpan.textContent = malfunctionCount;
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+           
+            const savedConstatations = localStorage.getItem('constatations');
+            if (savedConstatations) {
+                openConstatations = JSON.parse(savedConstatations);
+            } else {
+                openConstatations = [];
+            }
+
+            updateInxhinierNotifications(); 
+        });
         
-        // Thirr Amortizimin me ngarkimin e parë (pasi te jete kyçur)
-        // Shënim: Ky funksion thirret pas kyçjes (ne loginForm.addEventListener)
+        // 6. Çkyçja
+        function logout() {
+            currentRole = '';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('login-form-container').style.display = 'flex';
+        }
